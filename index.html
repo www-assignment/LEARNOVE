@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Learnove · online & physical · unified university</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ══════════════════════════════════════
+       LOADING SCREEN
+    ══════════════════════════════════════ */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0d6e8 0%, #e8d0f0 25%, #d6c8f5 50%, #c8d8f8 75%, #d0e8f8 100%);
+      background-size: 400% 400%;
+      animation: loaderBgShift 5s ease infinite;
+    }
+
+    @keyframes loaderBgShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Moving blobs behind loader */
+    .loader-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0;
+      animation: blobAppear 1s ease forwards;
+    }
+    .lb1 { width: 500px; height: 500px; background: radial-gradient(circle, #f7c8e8, transparent); top: -100px; left: -120px; animation-delay: 0.1s; }
+    .lb2 { width: 600px; height: 600px; background: radial-gradient(circle, #c8d0f8, transparent); bottom: -150px; right: -150px; animation-delay: 0.2s; }
+    .lb3 { width: 350px; height: 350px; background: radial-gradient(circle, #e8c8f8, transparent); top: 40%; left: 45%; transform: translate(-50%, -50%); animation-delay: 0.15s; }
+    @keyframes blobAppear { to { opacity: 0.55; } }
+
+    /* Loader inner content */
+    .loader-inner {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    /* ── Logo Mark (SVG icon that falls from above) ── */
+    .loader-logo-mark {
+      opacity: 0;
+      transform: translateY(-160px) scale(0.7);
+      animation: logoFall 0.9s cubic-bezier(0.34, 1.4, 0.64, 1) 0.5s forwards;
+      filter: drop-shadow(0 16px 40px rgba(150, 90, 200, 0.35));
+    }
+
+    @keyframes logoFall {
+      0%   { opacity: 0; transform: translateY(-160px) scale(0.7) rotate(-8deg); }
+      60%  { opacity: 1; transform: translateY(6px) scale(1.04) rotate(1.5deg); }
+      80%  { transform: translateY(-4px) scale(0.98) rotate(-0.5deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    }
+
+    /* ── LEARNOVE letter reveal ── */
+    .loader-word {
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+    }
+
+    .loader-char {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.2rem, 8vw, 4.2rem);
+      font-weight: 900;
+      letter-spacing: 2px;
+      opacity: 0;
+      transform: translateY(-60px);
+      background: linear-gradient(145deg, #321d47, #6b3f8c, #9f6bb5, #c090d8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 4px 16px rgba(150, 90, 200, 0.3));
+      animation: charDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Stagger each letter */
+    .loader-char:nth-child(1) { animation-delay: 1.4s; }
+    .loader-char:nth-child(2) { animation-delay: 1.55s; }
+    .loader-char:nth-child(3) { animation-delay: 1.70s; }
+    .loader-char:nth-child(4) { animation-delay: 1.85s; }
+    .loader-char:nth-child(5) { animation-delay: 2.00s; }
+    .loader-char:nth-child(6) { animation-delay: 2.15s; }
+    .loader-char:nth-child(7) { animation-delay: 2.30s; }
+    .loader-char:nth-child(8) { animation-delay: 2.45s; }
+
+    @keyframes charDrop {
+      0%   { opacity: 0; transform: translateY(-60px) scaleY(0.6); }
+      55%  { opacity: 1; transform: translateY(5px) scaleY(1.06); }
+      75%  { transform: translateY(-3px) scaleY(0.97); }
+      100% { opacity: 1; transform: translateY(0) scaleY(1); }
+    }
+
+    /* Tagline under the letters */
+    .loader-tagline {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(0.75rem, 2.5vw, 1rem);
+      font-weight: 400;
+      color: #4a2e6a;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: taglineFade 0.8s ease 3.0s forwards;
+    }
+
+    @keyframes taglineFade {
+      to { opacity: 0.7; transform: translateY(0); }
+    }
+
+    /* ── Progress bar ── */
+    .loader-progress-wrap {
+      width: clamp(180px, 40vw, 300px);
+      height: 3px;
+      background: rgba(200, 170, 230, 0.25);
+      border-radius: 99px;
+      overflow: hidden;
+      opacity: 0;
+      animation: taglineFade 0.5s ease 2.8s forwards;
+    }
+
+    .loader-progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #b06fd0, #80b8f0, #e08ed8);
+      background-size: 200% 100%;
+      animation: progressFill 1.4s cubic-bezier(0.4, 0, 0.2, 1) 3.1s forwards,
+                 shimmer 1.2s linear 3.1s infinite;
+    }
+
+    @keyframes progressFill {
+      0%   { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Loader fade-out ── */
+    #loader.fade-out {
+      animation: loaderFadeOut 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes loaderFadeOut {
+      0%   { opacity: 1; transform: scale(1); }
+      60%  { opacity: 0.4; transform: scale(1.015); }
+      100% { opacity: 0; transform: scale(1.03); pointer-events: none; }
+    }
+
+    /* ── Floating particles ── */
+    .loader-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      opacity: 0;
+      animation: floatParticle linear infinite;
+    }
+
+    @keyframes floatParticle {
+      0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.4; }
+      100% { opacity: 0; transform: translateY(-100vh) scale(1.2); }
+    }
+
+    /* ══════════════════════════════════════
+       MAIN SITE (hidden until loader done)
+    ══════════════════════════════════════ */
+    #main-site {
+      opacity: 0;
+      transition: opacity 0.6s ease 0.2s;
+    }
+
+    #main-site.visible {
+      opacity: 1;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #f0d6e8 0%, #e8d0f0 25%, #d6c8f5 50%, #c8d8f8 75%, #d0e8f8 100%);
+      min-height: 100vh;
+    }
+
+    /* ── Background blobs ── */
+    .bg-blobs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; }
+    .blob-1 { width: 500px; height: 500px; background: radial-gradient(circle, #f7c8e8, transparent); top: -100px; left: -100px; }
+    .blob-2 { width: 600px; height: 600px; background: radial-gradient(circle, #c8d0f8, transparent); bottom: -150px; right: -150px; }
+    .blob-3 { width: 350px; height: 350px; background: radial-gradient(circle, #e8c8f8, transparent); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+    /* ── Glass mixin ── */
+    .glass {
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 8px 32px rgba(180,150,200,0.15);
+    }
+
+    /* ══════════════════════════════════════
+       DESKTOP LAYOUT  (≥ 1024px)
+    ══════════════════════════════════════ */
+    .container {
+      position: relative; z-index: 1;
+      width: 100%; height: 100vh;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 280px 1fr 280px;
+      grid-template-rows: 1fr;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: 100%;
+    }
+
+    .panel-card {
+      padding: 18px;
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 55px;
+      border: 1px solid rgba(255,255,255,0.7);
+      overflow: hidden;
+    }
+
+    .card-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #4a2e6a;
+      letter-spacing: 0.4px;
+      text-align: center;
+      margin-bottom: 10px;
+      opacity: 0.85;
+    }
+
+    .donut-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+    .donut-svg { width: 130px; height: 130px; transform: rotate(-90deg); }
+    .donut-track { fill: none; stroke: rgba(200,170,230,0.25); stroke-width: 10; }
+    .donut-seg-purple { fill: none; stroke: url(#engGrad1); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 0 251.2; transition: stroke-dasharray 1.4s cubic-bezier(0.4,0,0.2,1); }
+    .donut-seg-teal   { fill: none; stroke: url(#engGrad2); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 0 251.2; transition: stroke-dasharray 1.4s cubic-bezier(0.4,0,0.2,1) 0.15s; }
+    .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; }
+    .donut-pct { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 900; background: linear-gradient(135deg,#6b3f8c,#9f6bb5); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1; }
+    .donut-sub { font-size: 0.6rem; color: #7a5a9a; font-weight: 600; opacity: 0.75; margin-top: 2px; }
+
+    .engagement-metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-top: 10px; padding: 0 4px; }
+    .metric-item { display: flex; flex-direction: column; align-items: center; gap: 3px; background: rgba(255,255,255,0.4); border-radius: 14px; padding: 6px 2px; border: 1px solid rgba(255,255,255,0.7); transition: all 0.25s; cursor: default; }
+    .metric-item:hover { background: rgba(220,180,250,0.35); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(150,90,180,0.2); }
+    .metric-icon  { font-size: 16px; line-height: 1; }
+    .metric-label { font-size: 0.58rem; font-weight: 600; color: #4a2e6a; opacity: 0.8; text-align: center; line-height: 1.1; }
+    .metric-val   { font-size: 0.65rem; font-weight: 700; color: #7b3fa0; }
+
+    .gauge-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+    .gauge-svg  { width: 110px; height: 110px; }
+    .gauge-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-46%); display: flex; flex-direction: column; align-items: center; }
+    .gauge-val  { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: #4a2e6a; line-height: 1; }
+    .gauge-unit { font-size: 0.6rem; color: #7a5a9a; font-weight: 600; margin-top: 1px; }
+
+    .dashboard-actions { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; padding: 0 4px; }
+    .action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.7); border-radius: 16px; cursor: pointer; transition: all 0.25s; }
+    .action-btn:hover { background: rgba(220,180,250,0.4); transform: translateY(-2px); box-shadow: 0 5px 14px rgba(150,90,180,0.25); }
+    .action-icon  { font-size: 18px; }
+    .action-label { font-size: 0.6rem; font-weight: 700; color: #4a2e6a; opacity: 0.85; }
+    .card-footer-label { text-align: center; font-size: 0.72rem; font-weight: 700; color: #5a3a7a; letter-spacing: 0.5px; margin-top: 8px; opacity: 0.7; text-transform: uppercase; }
+
+    .center-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(20px);
+      border-radius: 55px;
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+    .center-panel { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; align-items: center; }
+
+    .notch-svg { position: absolute; top: 0; left: 0; width: 100%; height: 70px; overflow: visible; pointer-events: none; z-index: 2; }
+
+    .notch-tray {
+      position: absolute; top: -2px; left: 50%; transform: translateX(-50%) scale(1.02); z-index: 10;
+      animation: pillGradientShift 3s infinite alternate;
+      background-size: 200% 200%; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      padding: 5px 32px; border-radius: 60px; display: flex; gap: 40px;
+      border: 1px solid rgba(255,255,255,0.95); box-shadow: 0 8px 28px rgba(170,130,200,0.4);
+      transition: all 0.3s ease;
+    }
+    @keyframes pillGradientShift {
+      0%   { background: linear-gradient(145deg,#f0d6e8,#e8d0f0,#d6c8f5); }
+      25%  { background: linear-gradient(145deg,#e8d0f0,#d6c8f5,#c8d8f8); }
+      50%  { background: linear-gradient(145deg,#d6c8f5,#c8d8f8,#d0e8f8); }
+      75%  { background: linear-gradient(145deg,#c8d8f8,#d0e8f8,#f0d6e8); }
+      100% { background: linear-gradient(145deg,#d0e8f8,#f0d6e8,#e8d0f0); }
+    }
+
+    .pill-icon { display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; font-weight: 300; text-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; line-height: 1; font-family: 'Nunito','Arial Unicode MS',sans-serif; z-index: 12; }
+    .pill-icon:hover { transform: scale(1.15); text-shadow: 0 0 18px rgba(255,255,255,0.8); }
+
+    .nav-icon-box {
+      width: 70px; height: 70px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; font-size: 24px; color: #4a2e6a;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s ease; cursor: default;
+    }
+    .nav-icon-box span { font-size: 0.6rem; font-weight: 600; color: #4a2e6a; opacity: 0.8; line-height: 1; }
+    .nav-icon-box:hover { background: rgba(220,180,250,0.4); transform: translateY(-2px); border-color: rgba(255,255,255,0.9); }
+
+    @media (max-width: 1023px) {
+      .nav-icon-box { width: 65px; height: 65px; font-size: 22px; border-radius: 18px; }
+      .nav-icon-box span { font-size: 0.55rem; }
+    }
+    @media (max-width: 599px) {
+      .main-nav-row { gap: 6px; }
+      .nav-icon-box { width: 60px; height: 60px; font-size: 20px; border-radius: 16px; }
+      .nav-icon-box span { font-size: 0.5rem; }
+    }
+    @media (max-width: 380px) {
+      .nav-icon-box { width: 50px; height: 50px; font-size: 18px; border-radius: 14px; }
+      .nav-icon-box span { font-size: 0.45rem; }
+    }
+
+    .center-content { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 72px; }
+    .image-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin: 10px 0; }
+    .centered-image { max-width: 85%; max-height: 55vh; object-fit: contain; transition: transform 0.3s ease; }
+    .centered-image:hover { transform: scale(1.02); }
+
+    .company-name { font-family: 'Orbitron',sans-serif; font-size: 2.6rem; font-weight: 900; letter-spacing: 6px; text-transform: uppercase; margin-top: 24px; margin-bottom: 8px; background: linear-gradient(145deg,#321d47,#6b3f8c,#9f6bb5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .tagline { font-size: 1.1rem; font-weight: 400; color: #2c1c38; text-align: center; line-height: 1.6; max-width: 80%; margin-bottom: 16px; letter-spacing: 0.3px; }
+
+    .main-nav-row { display: flex; gap: 28px; padding: 10px 0; margin-bottom: 10px; }
+
+    .right-panel { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+
+    .right-pill { flex-shrink: 0; background: rgba(255,255,255,0.45); backdrop-filter: blur(20px); border-radius: 60px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 6px 22px rgba(150,120,180,0.25); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .pill-icons-group { display: flex; align-items: center; gap: 20px; }
+    .pill-icons-group .icon-wrapper { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(160,100,200,0.7); border-radius: 50%; transition: all 0.3s cubic-bezier(0.2,0.9,0.3,1.2); cursor: default; border: 1px solid rgba(255,255,255,0.6); box-shadow: 0 4px 12px rgba(130,80,170,0.3); }
+    .pill-icons-group .icon-wrapper svg { width: 26px; height: 26px; stroke: white; }
+
+    .signup-pill { background: rgba(255,255,255,0.4); border-radius: 40px; padding: 8px 22px; border: 1px solid white; font-size: 0.95rem; font-weight: 600; color: #2e1b3a; letter-spacing: 0.3px; backdrop-filter: blur(4px); white-space: nowrap; cursor: pointer; }
+    .signup-pill::after { content: "Sign up ›"; opacity: 0.9; }
+
+    .course-panel { flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.3); backdrop-filter: blur(4px); border-radius: 55px; border: 1px solid rgba(255,255,255,0.6); overflow: hidden; padding: 18px 14px 14px 14px; }
+
+    .search-section { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.7); border-radius: 60px; margin-bottom: 16px; }
+    .search-icon { font-size: 18px; opacity: 0.6; }
+    .search-section input { background: transparent; border: none; outline: none; font-family: 'Nunito',sans-serif; font-size: 0.95rem; width: 100%; color: #2c1c38; }
+    .search-section input::placeholder { color: rgba(44,28,56,0.5); font-weight: 300; }
+
+    .course-tab-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .course-tab { flex: 1; padding: 8px 0; border-radius: 40px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 600; color: #2e1b3a; text-align: center; cursor: pointer; transition: all 0.2s; text-transform: lowercase; }
+    .course-tab:first-letter { text-transform: uppercase; }
+    .course-tab.active { background: rgba(220,180,250,0.7); border-color: white; box-shadow: 0 4px 12px rgba(150,90,180,0.3); color: #1f0f2e; font-weight: 700; transform: scale(1.02); }
+
+    .course-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; padding-right: 2px; }
+    .course-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 24px; background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.7); }
+    .course-thumb { width: 42px; height: 42px; border-radius: 14px; flex-shrink: 0; background: rgba(200,160,230,0.4); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .course-info { flex: 1; min-width: 0; }
+    .course-title { font-weight: 700; font-size: 0.95rem; line-height: 1.3; color: #2e1b3a; display: block; }
+    .course-meta  { font-size: 0.7rem; opacity: 0.7; color: #2e1b3a; display: flex; gap: 8px; }
+
+    @media (max-width: 1023px) {
+      .container { height: auto; overflow: visible; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; gap: 14px; padding: 16px; }
+      .center-wrapper { grid-column: 1 / -1; grid-row: 1; border-radius: 32px; min-height: 380px; }
+      .left-panel { grid-column: 1; grid-row: 2; height: auto; flex-direction: row; gap: 12px; }
+      .panel-card { flex: 1 1 0; border-radius: 28px; padding: 14px; }
+      .right-panel { grid-column: 2; grid-row: 2; height: auto; }
+      .course-panel { border-radius: 28px; max-height: 420px; }
+      .center-content { margin-top: 62px; }
+      .company-name   { font-size: 2rem; letter-spacing: 4px; }
+      .tagline        { font-size: 0.95rem; }
+      .centered-image { max-height: 38vh; }
+      .main-nav-row   { gap: 16px; }
+      .donut-svg  { width: 110px; height: 110px; }
+      .donut-pct  { font-size: 1.4rem; }
+      .gauge-svg  { width: 95px; height: 95px; }
+      .gauge-val  { font-size: 1.2rem; }
+      .engagement-metrics { grid-template-columns: repeat(2,1fr); }
+    }
+
+    @media (max-width: 599px) {
+      body { overflow-x: hidden; }
+      .container { height: auto; overflow: visible; display: flex; flex-direction: column; gap: 12px; padding: 12px; }
+      .center-wrapper { border-radius: 28px; min-height: unset; }
+      .center-content { margin-top: 56px; }
+      .notch-tray { padding: 4px 18px; gap: 20px; }
+      .pill-icon  { font-size: 18px; }
+      .main-nav-row { gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+      .centered-image { max-height: 30vh; max-width: 90%; }
+      .company-name { font-size: 1.6rem; letter-spacing: 3px; margin-top: 12px; margin-bottom: 6px; }
+      .tagline { font-size: 0.85rem; max-width: 92%; margin-bottom: 12px; }
+      .left-panel { flex-direction: row; gap: 10px; height: auto; }
+      .panel-card { flex: 1 1 0; border-radius: 24px; padding: 12px 10px; }
+      .card-label { font-size: 0.68rem; margin-bottom: 6px; }
+      .donut-area { flex: unset; }
+      .donut-svg  { width: 90px; height: 90px; }
+      .donut-pct  { font-size: 1.1rem; }
+      .engagement-metrics { grid-template-columns: repeat(2,1fr); gap: 4px; margin-top: 6px; }
+      .metric-icon  { font-size: 13px; }
+      .metric-label { font-size: 0.52rem; }
+      .metric-val   { font-size: 0.58rem; }
+      .gauge-area { flex: unset; }
+      .gauge-svg  { width: 88px; height: 88px; }
+      .gauge-val  { font-size: 1.1rem; }
+      .gauge-unit { font-size: 0.55rem; }
+      .dashboard-actions { gap: 4px; }
+      .action-btn { padding: 6px 2px; border-radius: 12px; }
+      .action-icon  { font-size: 15px; }
+      .action-label { font-size: 0.54rem; }
+      .card-footer-label { font-size: 0.6rem; margin-top: 4px; }
+      .right-pill { border-radius: 40px; padding: 10px 16px; }
+      .pill-icons-group .icon-wrapper { width: 38px; height: 38px; }
+      .pill-icons-group .icon-wrapper svg { width: 22px; height: 22px; }
+      .signup-pill { padding: 7px 16px; font-size: 0.85rem; }
+      .course-panel { border-radius: 24px; padding: 14px 12px 12px 12px; max-height: 420px; }
+      .course-tab   { font-size: 0.78rem; padding: 7px 0; }
+      .course-title { font-size: 0.88rem; }
+      .course-thumb { width: 36px; height: 36px; font-size: 18px; border-radius: 10px; }
+    }
+
+    @media (max-width: 380px) {
+      .left-panel { flex-direction: column; }
+      .panel-card { padding: 10px; }
+      .company-name { font-size: 1.3rem; letter-spacing: 2px; }
+      .engagement-metrics { grid-template-columns: repeat(4,1fr); }
+    }
+
+    @media (min-width: 1440px) {
+      .container { grid-template-columns: 310px 1fr 310px; padding: 24px; gap: 20px; }
+      .company-name { font-size: 3rem; }
+      .tagline { font-size: 1.15rem; }
+    }
+
+    .course-list::-webkit-scrollbar { width: 4px; }
+    .course-list::-webkit-scrollbar-track { background: transparent; }
+    .course-list::-webkit-scrollbar-thumb { background: rgba(160,96,208,0.3); border-radius: 2px; }
+
+    .mobile-nav { display: none; }
+
+    @media (max-width: 1023px) {
+      body { padding-bottom: 74px; }
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        width: calc(100% - 24px);
+        max-width: 480px;
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255,255,255,0.85);
+        border-radius: 60px;
+        box-shadow: 0 8px 32px rgba(160,120,200,0.25), 0 2px 8px rgba(0,0,0,0.06);
+        padding: 6px 10px;
+        justify-content: space-around;
+        align-items: center;
+        animation: navSlideUp 0.4s cubic-bezier(0.34,1.4,0.64,1) both;
+      }
+      @keyframes navSlideUp {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+      }
+      .mobile-nav .nav-item {
+        display: flex; flex-direction: column; align-items: center; gap: 2px;
+        padding: 8px 18px; border-radius: 50px; text-decoration: none;
+        font-size: 0.65rem; font-weight: 700; color: #7a5a9a; letter-spacing: 0.3px;
+        transition: all 0.25s cubic-bezier(0.2,0.9,0.3,1.2); position: relative;
+      }
+      .mobile-nav .nav-item span { font-size: 20px; line-height: 1; transition: transform 0.25s cubic-bezier(0.2,0.9,0.3,1.2); }
+      .mobile-nav .nav-item:hover span { transform: translateY(-2px) scale(1.15); }
+      .mobile-nav .nav-item.active {
+        background: linear-gradient(135deg, rgba(220,180,250,0.6), rgba(190,200,255,0.5));
+        border: 1px solid rgba(255,255,255,0.9); color: #3a1a5a;
+        box-shadow: 0 4px 14px rgba(150,90,180,0.25);
+      }
+      .mobile-nav .nav-item.active span { transform: translateY(-2px) scale(1.1); filter: drop-shadow(0 2px 6px rgba(150,90,200,0.4)); }
+      .mobile-nav .nav-item.active::after {
+        content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+        width: 4px; height: 4px; background: #a060d0; border-radius: 50%;
+        box-shadow: 0 0 6px rgba(160,96,208,0.7);
+      }
+    }
+
+    @media (max-width: 380px) {
+      .mobile-nav .nav-item { padding: 7px 12px; font-size: 0.6rem; }
+      .mobile-nav .nav-item span { font-size: 18px; }
+    }
+
+    img.emoji { height: 1em; width: 1em; vertical-align: -0.1em; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     LOADING SCREEN
+═══════════════════════════════════════ -->
+<div id="loader">
+  <!-- Background blobs -->
+  <div class="loader-blob lb1"></div>
+  <div class="loader-blob lb2"></div>
+  <div class="loader-blob lb3"></div>
+
+  <!-- Floating particles -->
+  <div class="loader-particles" id="loaderParticles"></div>
+
+  <!-- Main content -->
+  <div class="loader-inner">
+
+    <!-- Logo mark that falls from above -->
+    <div class="loader-logo-mark">
+      <img src="Logo.png" alt="Learnove Logo" style="width: 100px; height: 100px; object-fit: contain;">
+    </div>
+
+    <!-- Animated letter reveal -->
+    <div>
+      <div class="loader-word">
+        <span class="loader-char">L</span>
+        <span class="loader-char">E</span>
+        <span class="loader-char">A</span>
+        <span class="loader-char">R</span>
+        <span class="loader-char">N</span>
+        <span class="loader-char">O</span>
+        <span class="loader-char">V</span>
+        <span class="loader-char">E</span>
+      </div>
+      <div class="loader-tagline">online &amp; physical · unified university</div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="loader-progress-wrap">
+      <div class="loader-progress-bar" id="loaderBar"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN SITE
+═══════════════════════════════════════ -->
+<div id="main-site">
+
+<div class="bg-blobs">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<div class="container">
+
+  <!-- ═══ LEFT PANEL ═══ -->
+  <div class="left-panel">
+
+    <!-- Card 1: Student Engagement Index -->
+    <div class="panel-card">
+      <div class="card-label">Student Engagement Index</div>
+      <div class="donut-area">
+        <svg class="donut-svg" viewBox="0 0 90 90" id="engagementDonut">
+          <defs>
+            <linearGradient id="engGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#b06fd0"/><stop offset="100%" stop-color="#e08ed8"/>
+            </linearGradient>
+            <linearGradient id="engGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#70c8d8"/><stop offset="100%" stop-color="#80e0c0"/>
+            </linearGradient>
+          </defs>
+          <circle class="donut-track" cx="45" cy="45" r="36"/>
+          <circle class="donut-seg-purple" id="arcPurple" cx="45" cy="45" r="36"/>
+          <circle class="donut-seg-teal"   id="arcTeal"   cx="45" cy="45" r="36"/>
+        </svg>
+        <div class="donut-center">
+          <div class="donut-pct" id="engPct">0%</div>
+          <div class="donut-sub">overall</div>
+        </div>
+      </div>
+      <div class="engagement-metrics">
+        <div class="metric-item"><div class="metric-icon">📅</div><div class="metric-label">Attendance</div><div class="metric-val">88%</div></div>
+        <div class="metric-item"><div class="metric-icon">🙋</div><div class="metric-label">Participation</div><div class="metric-val">74%</div></div>
+        <div class="metric-item"><div class="metric-icon">📝</div><div class="metric-label">Grades</div><div class="metric-val">B+</div></div>
+        <div class="metric-item"><div class="metric-icon">⚡</div><div class="metric-label">Activities</div><div class="metric-val">12</div></div>
+      </div>
+    </div>
+
+    <!-- Card 2: Personalized Study Target -->
+    <div class="panel-card">
+      <div class="card-label">Personalized Study Target</div>
+      <div class="gauge-area">
+        <svg class="gauge-svg" viewBox="0 0 110 110" id="studyGauge">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c8a0f0"/><stop offset="100%" stop-color="#80b8f0"/>
+            </linearGradient>
+            <radialGradient id="gaugeCircleGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.9)"/><stop offset="100%" stop-color="rgba(230,215,250,0.6)"/>
+            </radialGradient>
+          </defs>
+          <circle cx="55" cy="55" r="48" fill="none" stroke="rgba(180,150,220,0.2)" stroke-width="1.5" stroke-dasharray="3 5"/>
+          <path d="M 14 75 A 41 41 0 1 1 96 75" fill="none" stroke="rgba(200,170,230,0.25)" stroke-width="8" stroke-linecap="round"/>
+          <path d="M 14 75 A 41 41 0 1 1 96 75" fill="none" stroke="url(#gaugeGrad)" stroke-width="8" stroke-linecap="round"
+                id="gaugeFill" stroke-dasharray="0 200" style="transition:stroke-dasharray 1.6s cubic-bezier(0.34,1.3,0.64,1);"/>
+          <circle cx="55" cy="55" r="32" fill="url(#gaugeCircleGrad)" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+          <g id="gaugeNeedle" style="transform-origin:55px 55px;transform:rotate(-100deg);transition:transform 1.6s cubic-bezier(0.34,1.56,0.64,1);">
+            <line x1="55" y1="55" x2="55" y2="26" stroke="#a060d0" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="55" cy="55" r="5" fill="#a060d0" stroke="white" stroke-width="1.5"/>
+          </g>
+          <circle cx="88" cy="28" r="5" fill="#a060d0" opacity="0.85">
+            <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-val" id="gaugeVal">0</div>
+          <div class="gauge-unit">hrs/week</div>
+        </div>
+      </div>
+      <div class="dashboard-actions">
+        <div class="action-btn"><div class="action-icon">📋</div><div class="action-label">Exams</div></div>
+        <div class="action-btn"><div class="action-icon">📁</div><div class="action-label">Projects</div></div>
+        <div class="action-btn"><div class="action-icon">⏰</div><div class="action-label">Deadlines</div></div>
+      </div>
+      <div class="card-footer-label">School Dashboard</div>
+    </div>
+
+  </div>
+
+  <!-- ═══ CENTER ═══ -->
+  <div class="center-wrapper glass">
+    <div class="center-panel">
+      <svg class="notch-svg" viewBox="0 0 100 70" preserveAspectRatio="none">
+        <path d="M0,0 L30,0 C36,0 38,25 50,25 C62,25 64,0 70,0 L100,0 L100,-2 L0,-2 Z" fill="url(#bgGrad)"/>
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f0d6e8"/>
+            <stop offset="33%" stop-color="#e8d0f0"/>
+            <stop offset="66%" stop-color="#d6c8f5"/>
+            <stop offset="100%" stop-color="#c8d8f8"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div class="notch-tray">
+        <div class="pill-icon">⌂</div>
+        <div class="pill-icon">◊</div>
+        <div class="pill-icon">☀</div>
+        <div class="pill-icon">◉</div>
+      </div>
+
+      <div class="center-content">
+        <div class="main-nav-row">
+          <div class="nav-icon-box">✎<span>Library</span></div>
+          <div class="nav-icon-box">⚛<span>Science</span></div>
+          <div class="nav-icon-box">☀<span>Campus</span></div>
+          <div class="nav-icon-box">◉<span>Events</span></div>
+        </div>
+        <div class="image-container">
+          <img src="centered-img.avif" alt="Centered content" class="centered-image">
+          <div class="company-name">LEARNOVE</div>
+          <div class="tagline">From campus to cloud. Transition from physical lectures to a global online university.<br>anytime · anywhere · accredited</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ RIGHT PANEL ═══ -->
+  <div class="right-panel">
+    <div class="right-pill">
+      <div class="pill-icons-group">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5"/>
+          </svg>
+        </div>
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="signup-pill"></div>
+    </div>
+
+    <div class="course-panel glass">
+      <div class="search-section">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search courses, subjects..." id="courseSearchInput">
+      </div>
+      <div class="course-tab-row" id="courseTabRow">
+        <div class="course-tab active" data-tab="secondary">secondary</div>
+        <div class="course-tab" data-tab="university">university</div>
+        <div class="course-tab" data-tab="skill">skill</div>
+      </div>
+      <div class="course-list" id="courseListContainer"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <a href="#" class="nav-item active" onclick="setActiveNav(this); return false;"><span>⌂</span>Home</a>
+  <a href="#" class="nav-item" onclick="setActiveNav(this); return false;"><span>📚</span>Courses</a>
+  <a href="#" class="nav-item" onclick="setActiveNav(this); return false;"><span>📊</span>Dashboard</a>
+  <a href="#" class="nav-item" onclick="setActiveNav(this); return false;"><span>👤</span>Profile</a>
+</nav>
+
+</div><!-- end #main-site -->
+
+<script>
+  /* ══════════════════════════════════════
+     LOADER LOGIC
+  ══════════════════════════════════════ */
+  (function() {
+    // Generate floating particles
+    const particlesEl = document.getElementById('loaderParticles');
+    const colors = ['#e8c0f8','#c0d8f8','#f8d0e8','#d0c8f8','#c8e8f8','#f0c8d8'];
+    for (let i = 0; i < 24; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 4 + Math.random() * 8;
+      p.style.cssText = `
+        width:${size}px; height:${size}px;
+        left:${Math.random() * 100}%;
+        top:${60 + Math.random() * 40}%;
+        background:${colors[Math.floor(Math.random() * colors.length)]};
+        animation-duration:${4 + Math.random() * 6}s;
+        animation-delay:${Math.random() * 3}s;
+        opacity:0;
+      `;
+      particlesEl.appendChild(p);
+    }
+
+    // Dismiss loader after all animations complete
+    // Progress bar fills from 3.1s over 1.4s → done at ~4.6s
+    // Add a small buffer then fade out
+    const DISMISS_TIME = 5000; // ms
+
+    setTimeout(() => {
+      const loader = document.getElementById('loader');
+      const mainSite = document.getElementById('main-site');
+
+      loader.classList.add('fade-out');
+
+      // Show main site while loader is fading
+      setTimeout(() => {
+        mainSite.classList.add('visible');
+      }, 300);
+
+      // Fully remove loader from DOM after fade
+      setTimeout(() => {
+        loader.style.display = 'none';
+        // Trigger main site animations
+        initMainSite();
+      }, 900);
+
+    }, DISMISS_TIME);
+  })();
+
+  /* ══════════════════════════════════════
+     MAIN SITE INIT (runs after loader)
+  ══════════════════════════════════════ */
+  function initMainSite() {
+    // ── Donut animation ──
+    (function() {
+      const circum = 2 * Math.PI * 36;
+      const pctTarget = 70;
+      setTimeout(() => {
+        let current = 0;
+        const step = () => { if (current < pctTarget) { current++; document.getElementById('engPct').textContent = current + '%'; requestAnimationFrame(step); } };
+        requestAnimationFrame(step);
+        const purpleLen = circum * 0.70, tealLen = circum * 0.15, gap = circum * 0.05;
+        const arcPurple = document.getElementById('arcPurple'), arcTeal = document.getElementById('arcTeal');
+        arcPurple.style.strokeDasharray = `${purpleLen} ${circum - purpleLen}`;
+        arcPurple.style.strokeDashoffset = '0';
+        arcTeal.style.strokeDasharray = `${tealLen} ${circum - tealLen}`;
+        arcTeal.style.strokeDashoffset = `${-(purpleLen + gap)}`;
+      }, 300);
+    })();
+
+    // ── Gauge animation ──
+    (function() {
+      const targetHrs = 24, fillRatio = 0.68, gaugeArcTotal = 200;
+      setTimeout(() => {
+        document.getElementById('gaugeNeedle').style.transform = `rotate(${-100 + fillRatio * 180}deg)`;
+        document.getElementById('gaugeFill').style.strokeDasharray = `${gaugeArcTotal * fillRatio} ${gaugeArcTotal}`;
+        let current = 0;
+        const step = () => { if (current < targetHrs) { current++; document.getElementById('gaugeVal').textContent = current; requestAnimationFrame(step); } };
+        requestAnimationFrame(step);
+      }, 400);
+    })();
+
+    // ── Course list ──
+    (function() {
+      const courseDB = {
+        secondary: [
+          { title: 'Mathematics (GCSE)',  thumb: '📐', level: 'ages 14–16', type: 'core' },
+          { title: 'Physical Sciences',   thumb: '⚗️', level: 'IGCSE',      type: 'lab' },
+          { title: 'English Literature',  thumb: '📖', level: 'high school', type: 'humanities' },
+          { title: 'History (modern)',    thumb: '🏛️', level: 'secondary',   type: 'elective' },
+          { title: 'Computer literacy',   thumb: '💻', level: 'foundation',  type: 'skills' },
+          { title: 'French beginner',     thumb: '🇫🇷', level: 'A2',         type: 'language' },
+          { title: 'Art & design',        thumb: '🎨', level: 'GCSE',        type: 'creative' }
+        ],
+        university: [
+          { title: 'BSc Computer Science',     thumb: '⌨️', level: 'undergrad',  type: 'STEM' },
+          { title: 'Business Administration',  thumb: '📊', level: 'BBA',        type: 'management' },
+          { title: 'Medicine (pre-clinical)',  thumb: '🩺', level: 'year 1-2',   type: 'health' },
+          { title: 'Psychology 101',           thumb: '🧠', level: 'intro',      type: 'social' },
+          { title: 'Engineering mathematics',  thumb: '⚙️', level: 'bachelor',   type: 'engineering' },
+          { title: 'International Law',        thumb: '⚖️', level: 'LLB',        type: 'law' },
+          { title: 'Economics (micro)',        thumb: '📈', level: 'core',       type: 'economics' }
+        ],
+        skill: [
+          { title: 'Web development bootcamp', thumb: '🌐', level: 'beginner',     type: 'tech' },
+          { title: 'Data analysis with Python',thumb: '🐍', level: 'intermediate', type: 'data' },
+          { title: 'Graphic design',           thumb: '🖌️', level: 'Canva/Adobe',  type: 'creative' },
+          { title: 'Digital marketing',        thumb: '📱', level: 'SEO/SEM',      type: 'business' },
+          { title: 'Public speaking',          thumb: '🎤', level: 'confidence',   type: 'soft skill' },
+          { title: 'Photography basics',       thumb: '📸', level: 'beginner',     type: 'art' },
+          { title: 'Project management',       thumb: '📋', level: 'PMP prep',     type: 'certification' }
+        ]
+      };
+
+      let activeTab = 'secondary';
+      const tabs = document.querySelectorAll('.course-tab');
+      const listContainer = document.getElementById('courseListContainer');
+      const searchInput   = document.getElementById('courseSearchInput');
+
+      function renderCourses() {
+        const q = searchInput.value.trim().toLowerCase();
+        let courses = courseDB[activeTab] || [];
+        if (q) courses = courses.filter(c => c.title.toLowerCase().includes(q) || c.level.toLowerCase().includes(q) || c.type.toLowerCase().includes(q));
+        if (!courses.length) { listContainer.innerHTML = `<div style="padding:20px;text-align:center;opacity:0.7;">✨ no matching courses</div>`; return; }
+        listContainer.innerHTML = courses.map(c => `
+          <div class="course-item">
+            <div class="course-thumb">${c.thumb}</div>
+            <div class="course-info">
+              <span class="course-title">${c.title}</span>
+              <span class="course-meta">${c.level} · ${c.type}</span>
+            </div>
+          </div>`).join('');
+      }
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          activeTab = tab.getAttribute('data-tab');
+          tabs.forEach(t => t.classList.toggle('active', t === tab));
+          renderCourses();
+        });
+      });
+      searchInput.addEventListener('input', renderCourses);
+      renderCourses();
+    })();
+  }
+
+  function setActiveNav(el) {
+    document.querySelectorAll('.mobile-nav .nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script>
+<script>
+function renderEmojis(target = document.body) {
+  twemoji.parse(target, { folder: "svg", ext: ".svg" });
+}
+renderEmojis();
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    mutation.addedNodes.forEach((node) => {
+      if (node.nodeType === 1 || node.nodeType === 3) { renderEmojis(node); }
+    });
+  });
+});
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
+</body>
+</html>
